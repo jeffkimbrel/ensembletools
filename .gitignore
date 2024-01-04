@@ -4,3 +4,6 @@
 .httr-oauth
 .DS_Store
 .quarto
+test.json
+SampleFBA.json
+working.R
