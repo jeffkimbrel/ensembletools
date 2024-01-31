@@ -41,8 +41,8 @@ parse_rc <- function(file_path,
   }
 
 
-  if (!type %in% c("compound", "compounds", "reaction", "reactions")) {
-    stop("type must be one of: compounds, reactions", call. = FALSE)
+  if (!type %in% c("compound", "compounds", "reaction", "reactions", "biomass")) {
+    stop("type must be one of: compounds, reactions or biomass", call. = FALSE)
   }
 
   # check that scale is a boolean value
@@ -63,8 +63,10 @@ parse_rc <- function(file_path,
   } else if (type %in% c("reaction", "reactions")) {
     j = jsonlite::fromJSON(file_path)[["FBAReactionVariables"]]
     type = "reactions" # change to "reactions" in case "reaction"
+  } else if (type %in% c("biomass")) {
+    j = jsonlite::fromJSON(file_path)[["FBABiomassVariables"]]
+    type = "biomass"
   }
-
 
   df <- j |>
     tibble::as_tibble() |>
@@ -74,6 +76,8 @@ parse_rc <- function(file_path,
     df = dplyr::rename(df, RC = modelcompound_ref)
   } else if (type == "reactions") {
     df = dplyr::rename(df, RC = modelreaction_ref)
+  } else if (type == "biomass") {
+    df = dplyr::rename(df, RC = biomass_ref)
   }
 
   df = df |>
