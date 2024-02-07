@@ -17,9 +17,16 @@ parse_solutions <- function(file_path,
     scale = scale
   )
 
+  biomass <- parse_rc(file_path,
+    type = "biomass",
+    min_value = min_value,
+    scale = scale
+  )
+
   RC <- rbind(
     compounds,
-    reactions
+    reactions,
+    biomass
   )
 
   return(RC)
@@ -34,7 +41,6 @@ parse_rc <- function(file_path,
                      type = "compounds",
                      min_value = 0,
                      scale = FALSE) {
-
   # check that file is found at file_path
   if (!file.exists(file_path)) {
     stop("file not found at file_path", call. = FALSE)
@@ -58,14 +64,14 @@ parse_rc <- function(file_path,
 
   # pull the correct portion of the json object
   if (type %in% c("compound", "compounds")) {
-    j = jsonlite::fromJSON(file_path)[["FBACompoundVariables"]]
-    type = "compounds" # change to "compounds" in case "compound"
+    j <- jsonlite::fromJSON(file_path)[["FBACompoundVariables"]]
+    type <- "compounds" # change to "compounds" in case "compound"
   } else if (type %in% c("reaction", "reactions")) {
-    j = jsonlite::fromJSON(file_path)[["FBAReactionVariables"]]
-    type = "reactions" # change to "reactions" in case "reaction"
+    j <- jsonlite::fromJSON(file_path)[["FBAReactionVariables"]]
+    type <- "reactions" # change to "reactions" in case "reaction"
   } else if (type %in% c("biomass")) {
-    j = jsonlite::fromJSON(file_path)[["FBABiomassVariables"]]
-    type = "biomass"
+    j <- jsonlite::fromJSON(file_path)[["FBABiomassVariables"]]
+    type <- "biomass"
   }
 
   df <- j |>
@@ -73,14 +79,14 @@ parse_rc <- function(file_path,
     tidyr::unnest(other_values)
 
   if (type == "compounds") {
-    df = dplyr::rename(df, RC = modelcompound_ref)
+    df <- dplyr::rename(df, RC = modelcompound_ref)
   } else if (type == "reactions") {
-    df = dplyr::rename(df, RC = modelreaction_ref)
+    df <- dplyr::rename(df, RC = modelreaction_ref)
   } else if (type == "biomass") {
-    df = dplyr::rename(df, RC = biomass_ref)
+    df <- dplyr::rename(df, RC = biomass_ref)
   }
 
-  df = df |>
+  df <- df |>
     dplyr::select(RC, class, variableType, other_values, lowerBound, upperBound, min, max, value) |>
     dplyr::group_by(RC) |>
     dplyr::mutate(model_no = dplyr::row_number()) |>

@@ -1,79 +1,83 @@
-library(tidyverse)
+#library(tidyverse)
 
-solutions = parse_solutions("/Users/kimbrel1/Library/CloudStorage/OneDrive-LLNL/Documents/Biofuels_SFA/Computational/ProbAnnotation/k-medioids/SampleFBA.json")
+solutions = parse_solutions("/Users/kimbrel1/Library/CloudStorage/OneDrive-LLNL/Documents/Biofuels_SFA/Computational/ProbAnnotation/k-medioids/SampleFBA.json",
+                             scale = F) |>
+  dplyr::filter(model_no > 400 | model_no <= 200)
 
-parse_rc("/Users/kimbrel1/Library/CloudStorage/OneDrive-LLNL/Documents/Biofuels_SFA/Computational/ProbAnnotation/k-medioids/SampleFBA.json",
-         type = "biomass")
+
+j = ensemble("/Users/kimbrel1/Library/CloudStorage/OneDrive-LLNL/Documents/Biofuels_SFA/Computational/ProbAnnotation/k-medioids/SampleFBA.json")
+
+# parse_rc("/Users/kimbrel1/Library/CloudStorage/OneDrive-LLNL/Documents/Biofuels_SFA/Computational/ProbAnnotation/k-medioids/SampleFBA.json",
+#          type = "biomass")
 
 
-solutions |> count(type)
-
+solutions |> dplyr::count(type)
+solutions |> dplyr::filter(other_values == 0) |> dplyr::count(type)
 
 # biomass histogram
-bio = parse_rc("/Users/kimbrel1/Library/CloudStorage/OneDrive-LLNL/Documents/Biofuels_SFA/Computational/ProbAnnotation/k-medioids/SampleFBA.json",
-         type = "biomass") |>
-  mutate(R = row_number()) |>
-  filter(R > 400 | R <= 200)
-
-median(bio$other_values)
-
-bio |>
-  filter(other_values > median(other_values)) |>
-  ggplot(aes(x = other_values)) + geom_histogram()
-
-
-bio |>
-  ggplot(aes(x = model_no, y = other_values)) +
-    geom_point()
-
-
-
+plot_biomass(solutions)
 
 
 # formatting the data for NMDS
 
-## Unscaled
-unscaled = solutions %>%
-  select(RC, class, variableType, other_values) %>%
-  mutate(other_values = ifelse(abs(other_values) < 1e-10, 0, other_values)) %>%
-  group_by(RC) %>%
-  mutate(R = paste0("model", row_number())) %>% # convert model # to a string
-  tidyr::pivot_wider(names_from = R, values_from = other_values)
-
-## Scaled
-scaled = solutions %>%
-  select(RC, class, variableType, other_values) %>%
-  mutate(other_values = ifelse(abs(other_values) < 1e-10, 0, other_values)) %>%
-  group_by(RC) %>%
-  mutate(other_values = case_when(
-    max(abs(other_values)) == 0 ~ 0,
-    TRUE ~ other_values / max(abs(other_values))
-  )) %>%
-  mutate(R = paste0("model", row_number())) %>% # convert model # to a string
-  tidyr::pivot_wider(names_from = R, values_from = other_values)
-
-
-
-
+# matrify_solutions(solutions, scale = FALSE)
+# matrify_solutions(solutions, scale = TRUE)
 
 
 # NMDS
 
-run_nmds = function(df, distance) {
-  df %>%
-    select(-class, -variableType) %>%
-    column_to_rownames("RC") %>%
-    t() %>%
-    as.matrix() %>%
-    vegan::metaMDS(distance = distance)
-}
+scaled.e = matrify_solutions(solutions, scale = TRUE) |>
+  ordinate_solutions(distance = "manhattan", dim = 2)
 
-scaled.e = run_nmds(scaled, distance = "euclidean")
+scaled.e.df = nmds_to_df(scaled.e)
 
+unscaled.e = matrify_solutions(solutions, scale = FALSE) |>
+  ordinate_solutions(distance = "manhattan", dim = 2)
 
+unscaled.e.df = nmds_to_df(unscaled.e)
 
 
 plot(scaled.e)
+plot(unscaled.e)
 
-j = vegan::scores(scaled.e)
-j
+vegan::scores(scaled.e)
+vegan::scores(unscaled.e)
+
+
+
+# PAM
+
+scaled.pam = matrify_solutions(solutions, scale = TRUE) |>
+  cluster_solutions(k = 4, metric = "euclidean")
+
+scaled.pam$silinfo$widths
+
+
+
+
+
+
+scaled.e.nmds = scaled.e.df %>%
+  dplyr::left_join(scaled.pam$silinfo$widths %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column("model"),
+            by = "model") %>%
+  dplyr::select(model, dplyr::starts_with("NMDS"), PAM = cluster, sil_width) %>%
+  dplyr::mutate(PAM = paste0("PAM", PAM))
+
+
+scaled.pam.medioids = scaled.e.nmds %>%
+  dplyr::filter(model %in% rownames(scaled.pam$medoids))
+
+
+
+
+
+scaled.e.nmds %>%
+  ggplot2::ggplot(ggplot2::aes(x = NMDS1, y = NMDS2, fill = PAM)) +
+  ggplot2::geom_point(pch = 21, alpha = .5, size = 2) +
+    #scale_fill_manual(values = palette_jak$bay(5)) +
+  ggplot2::geom_point(data = scaled.pam.medioids, pch = 4, size = 5, stroke = 2, ggplot2::aes(color = PAM, fill = NA), show.legend = FALSE) +
+    ggrepel::geom_text_repel(data = scaled.pam.medioids, size = 5, ggplot2::aes(label = PAM, color = PAM, )) +
+ #ggplot2::scale_color_manual(values = palette_jak$bay(5)) +
+  ggplot2::labs(title = "Scaled Manhattan")
