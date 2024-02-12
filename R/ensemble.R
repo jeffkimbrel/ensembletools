@@ -23,3 +23,16 @@ ensemble <- S7::new_class(
     )
   }
 )
+
+
+#' Get information about an ensemble
+#'
+#' @export
+#'
+
+info <- S7::new_generic("info", "x")
+S7::method(info, ensemble) <- function(x) {
+  e@solutions |> dplyr::select(RC, type) |>
+    unique() |>
+    dplyr::count(type)
+}
