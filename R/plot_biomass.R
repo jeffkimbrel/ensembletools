@@ -5,7 +5,17 @@
 
 
 plot_biomass = function(solutions) {
-  bio = solutions |>
+
+  # solutions must be class ensemble or a dataframe
+  if ("ensemble" %in%class(solutions)) {
+    s = solutions@solutions
+  } else if ("data.frame" %in% class(solutions)) {
+    s = solutions
+  } else {
+    stop(glue::glue("solutions must be class <ensemble> or a <data.frame>, not <{class(solutions)[1]}>."), call. = FALSE)
+  }
+
+  bio = s |>
     dplyr::filter(type == "biomass")
 
   bio |>
