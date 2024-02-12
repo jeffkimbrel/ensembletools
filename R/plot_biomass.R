@@ -5,8 +5,10 @@
 
 
 plot_biomass = function(solutions) {
-  solutions |>
-    dplyr::filter(type == "biomass") |>
+  bio = solutions |>
+    dplyr::filter(type == "biomass")
+
+  bio |>
     #dplyr::filter(other_values > median(other_values)) |>
     ggplot2::ggplot(ggplot2::aes(x = other_values)) +
     ggplot2::geom_histogram(binwidth = 0.1) +
