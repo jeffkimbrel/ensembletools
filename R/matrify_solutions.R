@@ -10,7 +10,7 @@
 matrify_solutions <- function(solution,
                               scale = FALSE,
                               types = c("compounds", "reactions", "biomass")) {
-  a <- solutions |>
+  a <- solution |>
     dplyr::filter(type %in% types) |>
     dplyr::select(RC, class, variableType, other_values) |>
     dplyr::group_by(RC) |> # need to group here to get the right row_number next

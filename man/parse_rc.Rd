@@ -4,13 +4,7 @@
 \alias{parse_rc}
 \title{parse reactions or compounds}
 \usage{
-parse_rc(
-  file_path,
-  type = "compounds",
-  strip_text = "",
-  min_value = 0,
-  scale = FALSE
-)
+parse_rc(file_path, type = "compounds", min_value = 0, scale = FALSE)
 }
 \description{
 parse reactions or compounds

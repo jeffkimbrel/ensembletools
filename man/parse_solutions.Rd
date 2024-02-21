@@ -4,12 +4,7 @@
 \alias{parse_solutions}
 \title{parse reactions and compounds}
 \usage{
-parse_solutions(
-  file_path,
-  min_value = 0,
-  strip_text = stringr::boundary("character"),
-  scale = FALSE
-)
+parse_solutions(file_path, min_value = 0, scale = FALSE, quiet = FALSE)
 }
 \description{
 parse reactions and compounds

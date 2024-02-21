@@ -15,6 +15,14 @@ plot_biomass = function(solutions) {
     stop(glue::glue("solutions must be class <ensemble> or a <data.frame>, not <{class(solutions)[1]}>."), call. = FALSE)
   }
 
+  # warning if scaled
+  if (isTRUE(solutions@scale)) {
+    message("Warning: data is scaled so biomass values are likely not useful")
+  }
+
+
+
+
   bio = s |>
     dplyr::filter(type == "biomass")
 

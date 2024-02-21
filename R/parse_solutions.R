@@ -4,12 +4,22 @@
 
 parse_solutions <- function(file_path,
                             min_value = 0,
-                            scale = FALSE) {
+                            scale = FALSE,
+                            quiet = FALSE) {
+  if (isFALSE(quiet)) {
+    message(glue::glue("=== Parsing {basename(file_path)} ==="))
+    message(glue::glue("Data scaling: {scale}"))
+  }
+
   compounds <- parse_rc(file_path,
     type = "compounds",
     min_value = min_value,
     scale = scale
   )
+
+  if (isFALSE(quiet)) {
+    message(glue::glue("Found {length(unique(compounds$RC))} compounds"))
+  }
 
   reactions <- parse_rc(file_path,
     type = "reactions",
@@ -17,11 +27,19 @@ parse_solutions <- function(file_path,
     scale = scale
   )
 
+  if (isFALSE(quiet)) {
+    message(glue::glue("Found {length(unique(reactions$RC))} reactions"))
+  }
+
   biomass <- parse_rc(file_path,
     type = "biomass",
     min_value = min_value,
     scale = scale
   )
+
+  if (isFALSE(quiet)) {
+    message(glue::glue("Found {length(unique(biomass$RC))} biomass"))
+  }
 
   RC <- rbind(
     compounds,
