@@ -117,7 +117,8 @@ sil_widths(e.e) |>
                      orientation = "y") +
   ggplot2::facet_wrap(~cluster,
                       scales = "free_y",
-                      ncol = 1) +
+                      ncol = 2,
+                      strip.position = "left") +
   ggplot2::theme_minimal() +
   ggplot2::theme(legend.position = "bottom",
                  axis.text.y=ggplot2::element_blank(),
