@@ -1,5 +1,10 @@
 #' Ordinate solutions
 #'
+#' @param solutions A data frame or ensemble of solutions
+#' @param distance A distance matrix
+#' @param dim The number of dimensions to ordinate
+#' @param quiet If TRUE, suppresses output from the ordination function
+#'
 #' @export
 
 
