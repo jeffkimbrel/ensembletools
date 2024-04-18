@@ -45,7 +45,7 @@ ensemble <- S7::new_class(
 
 info <- S7::new_generic("info", "x")
 S7::method(info, ensemble) <- function(x) {
-  e@solutions |>
+  x@solutions |>
     dplyr::select(RC, type, class) |>
     unique() |>
     dplyr::count(class, type) |>

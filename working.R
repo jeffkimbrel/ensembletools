@@ -33,10 +33,10 @@ e.e = ordinate_solutions(e,
                          distance = "euclidean",
                          quiet = T)
 plot(e.m@ordination$nmds)
-plot(e.m)
+#plot(e.m)
 
 plot(e.e@ordination$nmds)
-plot(e.e)
+#plot(e.e)
 
 #e.m@ordination$nmds$distance
 e.m@distance
@@ -58,13 +58,13 @@ e.m@clusters$k
 #e.m@clusters$pam
 sil_widths(e.m)
 medioids(e.m)
-plot(e.m)
+#plot(e.m)
 
 e.e = cluster_solutions(e.e, k = 0)
 e.e@clusters$k
 sil_widths(e.e)
 medioids(e.e)
-plot(e.e)
+#plot(e.e)
 
 # silhouette
 
@@ -124,3 +124,6 @@ sil_widths(e.e) |>
                  axis.text.y=ggplot2::element_blank(),
                  panel.grid.major.y = ggplot2::element_blank()) +
   ggplot2::labs(x = "Model", y = "Silhouette Width", fill = "Silhouette")
+
+saveRDS(e.e, file = "e_e.rds")
+
