@@ -1,0 +1,68 @@
+---
+format: dashboard
+embed-resources: true
+theme:
+  - spacelab
+editor_options: 
+  chunk_output_type: console
+params:
+  ensemble_file: "/Users/kimbrel1/Github/ensembletools/e_e.rds"
+---
+
+```{r}
+#| echo: FALSE
+#| eval: FALSE
+quarto::quarto_render("~/Desktop/working/test.qmd", 
+                      execute_params = list(ensemble_file = "/Users/kimbrel1/Github/ensembletools/e_m.rds"),
+                      metadata = list(title = as.character(Sys.Date())))
+```
+
+```{r}
+#| echo=FALSE
+
+library(tidyverse)
+library(ensembletools)
+
+ens = readRDS(file = params$ensemble_file)
+```
+
+# Ensemble
+
+## Row
+
+```{r}
+ens@solutions |> count(model_no) |> nrow()
+ens@scale
+
+info(ens) |>
+  filter(type != "biomass") |>
+  pivot_wider(names_from = type, values_from = n)
+
+
+```
+
+
+```{r}
+plotly::ggplotly(plot_biomass(ens) + theme_bw())
+```
+
+# Clusters
+
+```{r}
+c(
+  "Cluster count" = ens@clusters$k,
+  "Distance metric" = ens@distance,
+  "Ordination stress" = stress(ens)) |>
+  enframe() |>
+  gt::gt() |>
+  gt::tab_options(column_labels.hidden = TRUE) |>
+  gt::fmt_number(columns = c(value), decimals = 2)
+```
+
+```{r}
+sil_widths(ens) |> 
+  count(cluster) |>
+  gt::gt()
+```
+
+
