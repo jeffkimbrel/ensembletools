@@ -58,13 +58,31 @@ e.m@clusters$k
 #e.m@clusters$pam
 sil_widths(e.m)
 medioids(e.m)
+saveRDS(e.m, "/Users/kimbrel1/Github/ensembletools/e_m.rds")
+e.m = readRDS("/Users/kimbrel1/Github/ensembletools/e_m.rds")
 #plot(e.m)
 
-e.e = cluster_solutions(e.e, k = 0)
+e.e = cluster_solutions(e.e, k = 4)
 e.e@clusters$k
 sil_widths(e.e)
 medioids(e.e)
+saveRDS(e.e, "/Users/kimbrel1/Github/ensembletools/e_e.rds")
+e.e = readRDS("/Users/kimbrel1/Github/ensembletools/e_e.rds")
 #plot(e.e)
+
+plot_clusters(e.e)
+
+
+enframe(e.e@clusters$pam$clustering,
+        name = "model",
+        value = "PAM") |>
+  left_join(nmds_to_df(e.e@ordination$nmds), by = "model") |>
+  ggplot(aes(x = NMDS1, y = NMDS2, color = as.factor(PAM))) +
+    ggplot2::theme_minimal() +
+    geom_point()
+
+
+
 
 # silhouette
 

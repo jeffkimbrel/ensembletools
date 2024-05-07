@@ -12,9 +12,9 @@ params:
 ```{r}
 #| echo: FALSE
 #| eval: FALSE
-quarto::quarto_render("~/Desktop/working/test.qmd", 
-                      execute_params = list(ensemble_file = "/Users/kimbrel1/Github/ensembletools/e_m.rds"),
-                      metadata = list(title = as.character(Sys.Date())))
+#quarto::quarto_render("~/Desktop/working/test.qmd", 
+#                      execute_params = list(ensemble_file = "/Users/kimbrel1/Github/ensembletools/e_m.rds"),
+#                      metadata = list(title = as.character(Sys.Date())))
 ```
 
 ```{r}
@@ -28,15 +28,49 @@ ens = readRDS(file = params$ensemble_file)
 
 # Ensemble
 
+## Row {height=15%}
+
+```{r}
+#| content: valuebox
+#| title: "Models in Ensemble"
+models = ens@solutions |> count(model_no) |> nrow()
+list(
+  icon = "bezier2",
+  color = "success",
+  value = models
+)
+```
+
+```{r}
+#| content: valuebox
+#| title: "Compounds"
+compounds = info(ens) |> dplyr::filter(type == "compounds") |> dplyr::summarize(sum(n)) |> dplyr::pull()
+list(
+  icon = "circle",
+  color = "primary",
+  value = compounds
+)
+```
+
+
+```{r}
+#| content: valuebox
+#| title: "Reactions"
+compounds = info(ens) |> dplyr::filter(type == "reactions") |> dplyr::summarize(sum(n)) |> dplyr::pull()
+list(
+  icon = "arrow-right-circle-fill",
+  color = "secondary",
+  value = compounds
+)
+```
+
 ## Row
 
 ```{r}
-ens@solutions |> count(model_no) |> nrow()
-ens@scale
-
 info(ens) |>
   filter(type != "biomass") |>
-  pivot_wider(names_from = type, values_from = n)
+  pivot_wider(names_from = type, values_from = n) |>
+  gt::gt()
 
 
 ```
@@ -48,7 +82,10 @@ plotly::ggplotly(plot_biomass(ens) + theme_bw())
 
 # Clusters
 
+## Row {height=40%}
+
 ```{r}
+#| title: Cluster Summary
 c(
   "Cluster count" = ens@clusters$k,
   "Distance metric" = ens@distance,
@@ -60,9 +97,45 @@ c(
 ```
 
 ```{r}
+#| title: Cluster sizes
 sil_widths(ens) |> 
-  count(cluster) |>
+  count(cluster, name = "Cluster size") |>
   gt::gt()
 ```
 
+## Row {height=60%}
+
+```{r}
+plot_clusters(ens)
+```
+
+```{r}
+#| title: Silhouette Widths
+sil_widths(ens) |>
+  dplyr::mutate(SIL = dplyr::case_when(
+    sil_width >= 0.7 ~ "strong",
+    sil_width >= 0.5 ~ "good",
+    sil_width >= 0.25 ~ "weak",
+    sil_width < 0.25 ~ "none"
+  )) |>
+  dplyr::mutate(SIL = forcats::fct_relevel(SIL, "strong", "good", "weak", "none")) |>
+  ggplot2::ggplot(ggplot2::aes(y = reorder(model, sil_width), x = sil_width, fill = SIL)) +
+  ggplot2::scale_fill_manual(values = c(
+    "strong" = "blue",
+    "good" = "darkgreen",
+    "weak" = "orange",
+    "none" = "red"
+  )) +
+  ggplot2::geom_area(ggplot2::aes(group = SIL),
+                     orientation = "y") +
+  ggplot2::facet_wrap(~cluster,
+                      scales = "free_y",
+                      ncol = 1,
+                      strip.position = "left") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(legend.position = "right",
+                 axis.text.y=ggplot2::element_blank(),
+                 panel.grid.major.y = ggplot2::element_blank()) +
+  ggplot2::labs(y = "Model", x = "Silhouette Width", fill = "Silhouette")
+```
 
