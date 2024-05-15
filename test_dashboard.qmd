@@ -28,7 +28,7 @@ ens = readRDS(file = params$ensemble_file)
 
 # Ensemble
 
-## Row {height=15%}
+## Row {height=20%}
 
 ```{r}
 #| content: valuebox
