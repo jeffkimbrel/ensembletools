@@ -82,13 +82,13 @@ parse_rc <- function(file_path,
 
   # pull the correct portion of the json object
   if (type %in% c("compound", "compounds")) {
-    j <- jsonlite::fromJSON(file_path)[["FBACompoundVariables"]]
+    j <- jsonlite::fromJSON(file_path)[["data"]][["FBACompoundVariables"]]
     type <- "compounds" # change to "compounds" in case "compound"
   } else if (type %in% c("reaction", "reactions")) {
-    j <- jsonlite::fromJSON(file_path)[["FBAReactionVariables"]]
+    j <- jsonlite::fromJSON(file_path)[["data"]][["FBAReactionVariables"]]
     type <- "reactions" # change to "reactions" in case "reaction"
   } else if (type %in% c("biomass")) {
-    j <- jsonlite::fromJSON(file_path)[["FBABiomassVariables"]]
+    j <- jsonlite::fromJSON(file_path)[["data"]][["FBABiomassVariables"]]
     type <- "biomass"
   }
 

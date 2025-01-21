@@ -6,14 +6,14 @@ theme:
 editor_options: 
   chunk_output_type: console
 params:
-  ensemble_file: "/Users/kimbrel1/Github/ensembletools/e_e.rds"
+  ensemble_file: "/Users/kimbrel1/Github/ensembletools/e_e_u_c.rds"
 ---
 
 ```{r}
 #| echo: FALSE
 #| eval: FALSE
 #quarto::quarto_render("~/Desktop/working/test.qmd", 
-#                      execute_params = list(ensemble_file = "/Users/kimbrel1/Github/ensembletools/e_m.rds"),
+#                      execute_params = list(ensemble_file = "/Users/kimbrel1/Github/ensembletools/e_e_u_c.rds"),
 #                      metadata = list(title = as.character(Sys.Date())))
 ```
 

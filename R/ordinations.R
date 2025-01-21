@@ -12,7 +12,7 @@ ordinate_solutions <- function(solutions,
                                distance,
                                dim = 2,
                                quiet = F) {
-  if ("ensemble" %in% class(solutions)) {
+  if (inherits(solutions, ensemble)) {
     # If given an ensemble, then save the ordination data to a new slot and return a new ensemble
 
     if (isTRUE(quiet)) {

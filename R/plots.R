@@ -5,7 +5,7 @@
 plot_biomass = function(solutions) {
 
   # solutions must be class ensemble or a dataframe
-  if ("ensemble" %in%class(solutions)) {
+  if (inherits(solutions, ensemble)) {
     s = solutions@solutions
   } else if ("data.frame" %in% class(solutions)) {
     s = solutions
@@ -17,8 +17,6 @@ plot_biomass = function(solutions) {
   if (isTRUE(solutions@scale)) {
     message("Warning: data is scaled so biomass values are likely not useful")
   }
-
-
 
 
   bio = s |>

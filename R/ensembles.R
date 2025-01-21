@@ -4,6 +4,7 @@
 
 ensemble <- S7::new_class(
   "ensemble",
+  package = "ensembletools",
   properties = list(
     path = S7::class_character,
     solutions = S7::class_data.frame,

@@ -4,7 +4,7 @@
 
 
 cluster_solutions <- function(solutions, k = 0, metric = "manhattan") {
-  if ("ensemble" %in% class(solutions)) {
+  if (inherits(solutions, ensemble)) {
     solutions.m <- matrify_solutions(solutions@solutions, scale = solutions@scale) |>
       dplyr::select(-class, -variableType) |>
       tibble::column_to_rownames("RC") |>
